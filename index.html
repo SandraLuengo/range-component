@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Fooder</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <style>
+        body,html {
+            margin:0;
+            padding: 0;
+        }
+        .puntito {
+            width:10px;
+            height: 10px;
+            min-width:6px;
+            min-height: 6px;
+            border-radius: 50%;
+            background: red;
+            position: absolute;
+            left: 0%;
+            z-index: 1;
+        }
+
+        .puntito2 {
+            width:10px;
+            height: 10px;
+            min-width:6px;
+            min-height: 6px;
+            border-radius: 50%;
+            background: black;
+            position: absolute;
+            left: 100%;
+            z-index: 1;
+        }
+
+        .puntito:hover, .puntito2:hover {
+            cursor: pointer;
+        }
+
+        .linea {
+            width:100%;
+            height: 2px;
+            background: blue;
+            position: absolute;  
+            z-index: 0%;       
+        }
+    
+        .container {
+            width:200px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #80808042;
+            position: relative;
+        }
+
+        .container2 {
+            width:200px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            position: absolute;
+            top: 50px;
+        }
+    </style>
+    <body> 
+    <div class="container"> 
+        <p class="puntito"></p>
+        <p class="puntito2"></p>
+        <p class="linea"></p>
+    </div>
+    <div class="container2">
+        <p class="minPrice">0€</p>
+        <p class="selectedPrice"></p>
+        <p class="maxPrice">200€</p>
+    </div>
+    <script type="text/javascript">
+       window.onload = function() {
+           //refactorizar
+            let puntito = document.querySelector('.puntito');
+            let puntito2 = document.querySelector('.puntito2');
+            let container = document.querySelector('.container');
+            let selectedPrice = document.querySelector('.selectedPrice');
+            let minPriceElem = document.querySelector('.minPrice');
+            let maxPriceElem = document.querySelector('.maxPrice');
+            puntito.addEventListener("mousedown", e =>mousedown(e));
+            puntito2.addEventListener("mousedown", e =>mousedown(e));
+            document.addEventListener("mousemove", e =>mousemove(e));
+            document.addEventListener("mouseup", e =>mouseup(e));
+            let move = false;
+            let puntitoX = puntito.getBoundingClientRect().right - 1;
+            let mouseX = puntitoX;
+            let previusX;
+            let cont=0;
+            let minContainer = container.getBoundingClientRect().left;
+            let maxContainer = container.getBoundingClientRect().right;
+            let minPrice = 0;
+            let maxPrice = 200;
+            let selectedPuntito;
+
+            let mousedown = (e) => {
+                previusX = e.clientX;
+                selectedPuntito = document.querySelector(`.${ e.srcElement.className}`)
+                move = true;
+            }
+
+            let mousemove = (e) => {
+                if(move){
+                    mouseX = e.clientX;
+                    if(selectedPuntito.className==="puntito"){
+                        if(mouseX >= minContainer && puntito.getBoundingClientRect().right < puntito2.getBoundingClientRect().left-15) {
+                            minPriceElem.innerHTML = `${getPrice()}€`;
+                            selectedPuntito.style.left = `${getPercentage()}%`;
+                        } else if(mouseX < puntito.getBoundingClientRect().right && mouseX<puntito2.getBoundingClientRect().right - 10)  {
+                            selectedPuntito.style.left = `${getPercentage()}%`;
+                        }
+
+                    } else if (selectedPuntito.className==="puntito2") {
+                        if(mouseX >= minContainer && puntito2.getBoundingClientRect().left >= puntito.getBoundingClientRect().right) {
+                            maxPriceElem.innerHTML = `${getPrice()}€`;
+                            selectedPuntito.style.left = `${getPercentage()}%`;
+                        }else if(mouseX > puntito2.getBoundingClientRect().right && mouseX>puntito.getBoundingClientRect().right + 5)  {
+                            selectedPuntito.style.left = `${getPercentage()}%`;
+                        }
+
+                    }
+                }
+            }
+
+            let mouseup = (e) => move = false;
+
+            let getPercentage = () => {
+                let percentage = (mouseX * 100) / maxContainer
+                if(percentage > 100) {
+                    return 100;
+                } else if( percentage < 0) {
+                    return 0;
+                } else {
+                    return percentage;
+                }
+            }
+
+            let getPrice = () => {
+                return Math.round((getPercentage() * maxPrice) / 100);
+            }
+        };
+
+    </script>
+</body>
+</html>
